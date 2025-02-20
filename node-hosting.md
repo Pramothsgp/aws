@@ -106,11 +106,12 @@ This will generate a `dist` folder containing the production-ready files.
   </IfModule>
   ```
 
-### AllowOverride:
+### AllowOverride(httpd : amazon linux):
 
 1. **Edit Apache Configuration File**:
    Open the Apache configuration file for editing:
    ```bash
+   #httpd Amazon Linux
    sudo nano /etc/httpd/conf/httpd.conf
    ```
 
@@ -134,6 +135,13 @@ This will generate a `dist` folder containing the production-ready files.
    ```
 This should allow Apache to read `.htaccess` files, which will enable the URL rewrites needed for React Router.
 
+### AllowOverride(apache2 : Ubuntu):
+
+Make sure that the `mod_rewrite` module is enabled in Apache:
+``` bash 
+sudo a2enmod rewrite
+sudo systemctl restart apache2
+```
 ### Check apache log 
 To check for syntax errors in Apache's configuration files, you can use the following command:
 
