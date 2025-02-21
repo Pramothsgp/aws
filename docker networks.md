@@ -1,3 +1,36 @@
+# DOCKER NETWORKS 
+
+## Types of Docker Networks
+ - **Bridge**
+ - **Host**
+ - **Overlay**
+ - **macvlan**
+ ---
+Here’s a brief explanation of the Docker network types:
+
+1. **Bridge**:  
+   - The default network type for containers on a single Docker host.
+   - Containers can communicate with each other using the bridge network, which connects them to Docker’s virtual network interface (often called `docker0`).
+   - It provides network isolation between containers and the host system.
+   - Useful when you want containers to be able to communicate with each other but remain isolated from the host.
+
+2. **Host**:  
+   - Containers share the same network interface as the host machine.
+   - No isolation is provided, meaning the container’s network stack is directly tied to the host's network stack.
+   - Useful when you need the container to have direct access to the host's network, such as when low latency or high performance is critical.
+   
+3. **Overlay**:  
+   - This works on the basis of Master slave architecture
+   - Used in Docker Swarm or multi-host setups to enable communication between containers running on different Docker hosts.
+   - Creates a virtual network that spans across multiple Docker hosts, allowing containers on different machines to communicate with each other seamlessly.
+   - Provides abstraction and isolation while enabling cross-host communication.
+
+4. **macvlan**:  
+   - Allows you to assign a unique MAC address to each container, effectively making it appear as a physical device on the network.
+   - Useful when you need containers to be accessible on the local network as if they are standalone devices, for example, in situations requiring IP address management by external systems.
+
+Each of these networks is useful in different scenarios based on isolation, connectivity, and performance requirements.
+
 
 ### 1. **Install Docker**  
 If you haven't installed Docker yet, follow these steps for a typical Linux (CentOS/RHEL) installation:
@@ -52,6 +85,8 @@ For demonstration, let's pull and run an Ubuntu container:
 
 This will start the container in interactive mode and drop you into the Ubuntu shell.
 
+
+
 ### 3. **Create a Custom Bridge Network**  
 Now, create a custom bridge network to connect multiple containers.
 
@@ -66,6 +101,26 @@ Now, create a custom bridge network to connect multiple containers.
   ```bash
   docker network ls
   ```
+# **OR**
+
+``` bash []
+docker run -d --name <container name> --network <network name> ubuntu sleep infinity
+```
+This command creates and runs a Docker container in detached mode using the **`docker run`** command. Here’s a breakdown of each part of the command:
+
+### Command Breakdown:
+
+```bash
+docker run -d --name <container_name> --network <network_name> ubuntu sleep infinity
+```
+
+This will:
+- Create and start a new container in the background (detached mode).
+- Name the container `<container name>`.
+- Connect the container to the `<network> name` network.
+- Run the container with the `sleep infinity` command, keeping it running.
+
+Let me know if you'd like more details or examples!
 
 #### 3.2 Inspect the network
 
@@ -179,9 +234,7 @@ This command opens a new interactive shell session inside the running container.
 ```bash
 # 1. Install Docker
 sudo yum update -y
-sudo yum install -y yum-utils device-mapper-persistent-data lvm2
-sudo yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
-sudo yum install -y docker-ce
+sudo yum install -y docker
 sudo systemctl start docker
 sudo systemctl enable docker
 docker --version
@@ -217,3 +270,63 @@ docker rm ubuntu-container-2
 ---
 
 These steps guide you from installing Docker, running containers, creating and connecting a custom network, and understanding the `-dit` flag for 
+
+
+# Steps to delete a Docker network:
+
+1. **Check which containers are connected** (optional, if you want to ensure nothing is using the network):
+   You can inspect a network to see which containers are attached to it:
+
+   ```bash
+   docker network inspect <network_name_or_id>
+   ```
+
+2. **Disconnect containers from the network** (if necessary):
+   If there are containers connected to the network, you can disconnect them using:
+
+   ```bash
+   docker network disconnect <network_name> <container_name_or_id>
+   ```
+
+3. **Remove the network**:
+   Once the network is no longer in use by any containers, you can delete it:
+
+   ```bash
+   docker network rm <network_name>
+   ```
+
+   
+### Example:
+
+To remove the `app_bridge` network, assuming no containers are attached, you would run:
+
+```bash
+docker network rm app_bridge
+```
+
+Let me know if you need further assistance!
+
+
+# Steps to create Host Network
+
+1. **Create a container with the Host network**:  
+   This command runs the container and connects it directly to the host's network, sharing the host's network stack.
+
+   ```bash
+   docker run -d --name container-e --network host ubuntu sleep infinity
+   ```
+
+2. **Create a container with the default Host network**:  
+   This command runs the container and connects it to the default bridge network (isolated from the host network).
+
+   ```bash
+   docker run -d --name container-e ubuntu sleep infinity
+   ```
+
+3. **Manually connect an existing container to the Host network**:  
+   This command connects a running container to the **host network**, but containers usually use `--network host` during creation, so this is rarely needed.
+
+   ```bash
+   docker network connect host <container_name>
+   ```
+
