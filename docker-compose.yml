@@ -1,0 +1,51 @@
+version: '3.8' # version of docker compose
+
+networks:
+  app_network:    # network name 
+    driver: bridge  # network driver type eg : host , bridge , overlay , macvlan
+
+# services to run
+services:
+  frontend: # custom name
+    image: node:18 # image name : version
+    command: sh -c "npx create-react-app my-app && cd my-app && npm start"
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
+    restart: always
+    networks:
+      - app_network
+
+  backend:
+    image: node:18
+    command: sh -c "npm install express mysql && node server.js"
+    ports:
+      - "5000:5000"
+    depends_on:
+      - db
+    environment:
+      - DB_HOST=db
+      - DB_USER=root
+      - DB_PASSWORD=password
+      - DB_NAME=mydb
+    restart: always
+    networks:
+      - app_network
+
+  db:
+    image: mysql:8.0
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: password
+      MYSQL_DATABASE: mydb
+    volumes:
+      - db_data:/var/lib/mysql
+    restart: always
+    networks:
+      - app_network
+
+#Volume
+volume:
+  db_data: #volume name
