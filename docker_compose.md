@@ -1,4 +1,4 @@
-### **Docker Compose Basics (Without `-`)**  
+### **Docker Compose Basics**  
 
 Docker Compose is a tool for defining and managing multi-container Docker applications using a YAML file (`.yml` or `.yaml`). It allows you to configure services, networks, and volumes in a structured way.
 
