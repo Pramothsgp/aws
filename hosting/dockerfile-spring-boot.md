@@ -3,19 +3,34 @@ Here's a **multi-stage Dockerfile** for your Spring Boot backend. It builds the 
 ### **Dockerfile**  
 ```dockerfile
 # Stage 1: Build
-FROM maven:3.9.5-eclipse-temurin-17 AS builder
+FROM maven:3.9.7-eclipse-temurin-17 AS build
+
 WORKDIR /app
+
+# Copy Maven project files
 COPY pom.xml .
 RUN mvn dependency:go-offline
+
+# Copy source code
 COPY src ./src
+
+# Build the application
 RUN mvn clean package -DskipTests
 
 # Stage 2: Run
-FROM eclipse-temurin:17-jdk-alpine
+FROM openjdk:17-jdk-alpine
+
 WORKDIR /app
-COPY --from=builder /app/target/*.jar app.jar
+
+# Copy the JAR file from the builder stage
+COPY --from=build /app/target/*.jar app.jar
+
+# Expose port 8080
 EXPOSE 8080
-ENTRYPOINT ["java", "-jar", "app.jar"]
+
+# Run the Spring Boot application
+CMD ["java", "-jar", "app.jar"]
+
 ```
 
 ### **Explanation**  
