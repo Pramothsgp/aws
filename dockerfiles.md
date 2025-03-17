@@ -57,3 +57,46 @@ docker build -t my-nginx-app .
 
 ### **Final Summary**  
 This process creates a **Docker container** running an **Nginx web server** that serves your project files. 🚀
+
+
+Yes, optimizing a Docker image can be efficiently achieved using a **multistage build**. Here’s how:
+
+---
+
+### **Multistage Build Optimization**
+- Instead of including all dependencies and tools required for building the application in the final image, we use multiple stages.
+- The first stage (builder) contains everything needed to **build** the application.
+- The second stage (runtime) only includes what is necessary to **run** the application.
+
+### **Example: Node.js App**
+```dockerfile
+# Stage 1: Build stage
+FROM node:18 AS builder
+WORKDIR /app
+COPY package.json package-lock.json ./
+RUN npm install
+COPY . .
+RUN npm run build
+
+# Stage 2: Production runtime
+FROM node:18-alpine AS runtime
+WORKDIR /app
+COPY --from=builder /app/dist ./dist
+COPY --from=builder /app/node_modules ./node_modules
+CMD ["node", "dist/index.js"]
+```
+
+### **Benefits of Multistage Build**
+1. **Smaller Image Size**  
+   - The final image doesn’t include unnecessary dependencies, build tools, or source files.
+   
+2. **Faster Deployments**  
+   - Smaller images lead to quicker pulls and reduced network transfer time.
+
+3. **Better Security**  
+   - Reduces the attack surface by removing unnecessary build dependencies.
+
+4. **Improved Performance**  
+   - Optimized for production without carrying unnecessary artifacts.
+
+Would you like an example for a different stack, such as React, Java, or Python?
